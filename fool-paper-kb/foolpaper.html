@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FoolPaper 知识库</title>
+<style>
+:root {
+  --bg:#f5f5f7; --card:#ffffff; --text:#1d1d1f; --sub:#86868b;
+  --border:#e6e6e8; --tag-bg:#f0f0f2; --tag-text:#6e6e73;
+  --accent:#0066cc; --star:#f5a623; --divider:#d2d2d7;
+  --graph-bg:#fafafa; --node-bg:#1d1d1f; --node-text:#fff;
+  --line:#c6c6c8; --dash:#a1a1a6; --shadow:0 1px 3px rgba(0,0,0,.04);
+  --shadow-hover:0 4px 12px rgba(0,0,0,.08);
+}
+@media (prefers-color-scheme:dark) {
+  :root {
+    --bg:#000; --card:#1c1c1e; --text:#f5f5f7; --sub:#98989d;
+    --border:#38383a; --tag-bg:#2c2c2e; --tag-text:#a1a1a6;
+    --accent:#409cff; --star:#ffd60a; --divider:#38383a;
+    --graph-bg:#1c1c1e; --node-bg:#f5f5f7; --node-text:#000;
+    --line:#48484a; --dash:#636366; --shadow:none;
+    --shadow-hover:0 4px 12px rgba(0,0,0,.4);
+  }
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+.container{max-width:880px;margin:0 auto;padding:60px 24px 40px}
+header{text-align:center;margin-bottom:48px}
+header h1{font-size:48px;font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+header .tagline{font-size:20px;color:var(--sub);font-weight:400;margin-bottom:16px}
+header .stats{font-size:14px;color:var(--sub)}
+.divider{height:1px;background:var(--divider);margin:48px 0}
+.section-label{font-size:13px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.06em;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--shadow);transition:box-shadow .2s ease;display:flex;flex-direction:column;gap:8px;position:relative}
+.card:hover{box-shadow:var(--shadow-hover)}
+.card h2{font-size:17px;font-weight:600;line-height:1.4}
+.card h2 a{color:var(--text);text-decoration:none}
+.card h2 a:hover{color:var(--accent)}
+.card .meta{font-size:13px;color:var(--sub);display:flex;align-items:center;gap:8px}
+.card .meta .year{font-weight:500;background:var(--tag-bg);color:var(--tag-text);padding:2px 10px;border-radius:100px;font-size:12px}
+.card .tags{display:flex;flex-wrap:wrap;gap:6px}
+.card .tags span{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:500;background:var(--tag-bg);color:var(--tag-text)}
+.card .summary{font-size:14px;color:var(--sub);line-height:1.5;flex:1}
+.card .stars{color:var(--star);font-size:12px;letter-spacing:2px}
+.arxiv{font-size:12px;color:var(--accent);position:absolute;top:20px;right:20px;font-family:"SF Mono",Consolas,monospace}
+
+/* graph */
+.graph-section{background:var(--graph-bg);border:1px solid var(--border);border-radius:16px;padding:40px 32px;margin-bottom:32px}
+.graph-legend{display:flex;gap:24px;font-size:12px;color:var(--sub);margin-bottom:24px}
+.graph-legend span{display:flex;align-items:center;gap:6px}
+.graph-legend .solid{width:24px;height:2px;background:var(--line)}
+.graph-legend .dashed{width:24px;height:0;border-top:2px dashed var(--dash)}
+.graph-container{position:relative;height:340px}
+/* nodes */
+.g-node{position:absolute;background:var(--node-bg);color:var(--node-text);padding:8px 14px;border-radius:10px;font-size:12px;font-weight:500;text-align:center;white-space:nowrap;z-index:2}
+.g-node .g-year{font-size:10px;opacity:.6;display:block}
+/* edges */
+.g-edge{position:absolute;height:2px;background:var(--line);transform-origin:0 0;z-index:1}
+.g-edge.dash{height:0;border-top:2px dashed var(--dash);background:none}
+/* node positions */
+.n-resnet{left:40px;top:40px}
+.n-survey{left:40px;top:150px}
+.n-teacf{left:40px;top:260px}
+.n-lora{right:40px;top:40px}
+.n-nca{right:40px;top:150px}
+.n-bdcls{right:40px;top:260px}
+
+footer{text-align:center;color:var(--sub);font-size:12px;padding-top:32px}
+footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>FoolPaper</h1>
+  <p class="tagline">反懒惰的论文阅读框架</p>
+  <p class="stats">6 篇论文 · 自动生成</p>
+</header>
+
+<div class="section-label">论文卡片</div>
+
+<div class="grid">
+
+  <div class="card">
+    <h2><a href="papers/1512.03385.md">Deep Residual Learning for Image Recognition</a></h2>
+    <div class="meta"><span class="year">2016</span><span>CVPR Best Paper</span></div>
+    <div class="tags"><span>computer-vision</span><span>residual-learning</span><span>image-classification</span></div>
+    <p class="summary">让网络不学"我从零画什么"，而是学"我需要在上一层的基础上改什么"——就像修改草稿而不是重画。</p>
+    <div class="stars">★★★★★</div>
+    <span class="arxiv">1512.03385</span>
+  </div>
+
+  <div class="card">
+    <h2><a href="papers/2106.09685.md">LoRA: Low-Rank Adaptation of Large Language Models</a></h2>
+    <div class="meta"><span class="year">2022</span><span>ICLR 2022 · 引用 20,000+</span></div>
+    <div class="tags"><span>parameter-efficient-fine-tuning</span><span>low-rank-decomposition</span><span>large-language-models</span></div>
+    <p class="summary">大模型微调不需要动全部参数——只训练一个瘦身插件 A×B，省 10,000 倍参数。</p>
+    <div class="stars">★★★★★</div>
+    <span class="arxiv">2106.09685</span>
+  </div>
+
+  <div class="card">
+    <h2><a href="papers/neural-causal-abstractions.md">Neural Causal Abstractions</a></h2>
+    <div class="meta"><span class="year">2024</span><span>Bareinboim Lab · 因果AI奠基级</span></div>
+    <div class="tags"><span>causal-inference</span><span>causal-abstraction</span><span>neural-causal-models</span></div>
+    <p class="summary">教 AI 自动发现"什么是值得抽象的因果变量"——就像医生不检查每个细胞而看血压和心率。</p>
+    <div class="stars">★★★★☆</div>
+  </div>
+
+  <div class="card">
+    <h2><a href="papers/neurips2025-bdcls.md">Counterfactual Image Editing with Disentangled Causal Latent Space</a></h2>
+    <div class="meta"><span class="year">2025</span><span>NeurIPS 2025</span></div>
+    <div class="tags"><span>counterfactual-reasoning</span><span>causal-inference</span><span>image-editing</span></div>
+    <p class="summary">教 Stable Diffusion 懂"牵一发而动全身"——改了原因变量，所有结果变量跟着变。</p>
+    <div class="stars">★★★★☆</div>
+  </div>
+
+  <div class="card">
+    <h2><a href="papers/teacfnet-tgrs2024.md">TeACFNet: Texture-Aware Causal Feature Extraction for Multimodal RS</a></h2>
+    <div class="meta"><span class="year">2024</span><span>IEEE TGRS · SOTA</span></div>
+    <div class="tags"><span>remote-sensing</span><span>causal-inference</span><span>multimodal-fusion</span></div>
+    <p class="summary">遥感分类不准不是因为模型弱，而是传感器本身的偏差在捣乱——用因果推断把这些搅局者踢出去。</p>
+    <div class="stars">★★★★☆</div>
+  </div>
+
+  <div class="card">
+    <h2><a href="papers/causal-feature-survey-wang.md">深度学习图像分类模型因果特征学习研究综述</a></h2>
+    <div class="meta"><span class="year">2024</span><span>中文综述 · 60+ 方法</span></div>
+    <div class="tags"><span>survey</span><span>causal-feature-learning</span><span>explainable-AI</span></div>
+    <p class="summary">给深度学习装上"解释器"——三种方法告诉你模型到底在看图片的哪个部分来做决定。</p>
+    <div class="stars">★★★★☆</div>
+  </div>
+
+</div>
+
+<div class="divider"></div>
+
+<div class="section-label">知识图谱</div>
+
+<div class="graph-section">
+  <div class="graph-legend">
+    <span><span class="solid"></span>同主题</span>
+    <span><span class="dashed"></span>引用关联</span>
+  </div>
+
+  <div class="graph-container">
+    <!-- left column -->
+    <div class="g-node n-resnet">ResNet<span class="g-year">2016</span></div>
+    <div class="g-node n-survey">因果综述<span class="g-year">2024</span></div>
+    <div class="g-node n-teacf">TeACFNet<span class="g-year">2024</span></div>
+    <!-- right column -->
+    <div class="g-node n-lora">LoRA<span class="g-year">2022</span></div>
+    <div class="g-node n-nca">NCA<span class="g-year">2024</span></div>
+    <div class="g-node n-bdcls">BD-CLS<span class="g-year">2025</span></div>
+
+    <!-- same-theme edges -->
+    <div class="g-edge" style="left:134px;top:100px;width:calc(100% - 268px)"></div>
+    <div class="g-edge" style="left:134px;top:210px;width:calc(100% - 268px)"></div>
+    <!-- left column vertical edges -->
+    <div class="g-edge" style="left:90px;top:100px;width:0;height:70px"></div>
+    <div class="g-edge" style="left:90px;top:220px;width:0;height:70px"></div>
+    <!-- right column vertical edges -->
+    <div class="g-edge" style="left:calc(100% - 90px);top:100px;width:0;height:70px"></div>
+    <div class="g-edge" style="left:calc(100% - 90px);top:220px;width:0;height:70px"></div>
+
+    <!-- cross-column edges (diagonal dash) -->
+    <div class="g-edge" style="left:134px;top:55px;width:calc(100% - 268px)"></div>
+    <div class="g-edge" style="left:134px;top:165px;width:calc(100% - 268px)"></div>
+
+    <!-- dashed citation edges -->
+    <div class="g-edge dash" style="left:134px;top:65px;width:calc(100% - 268px);height:0;border-top-style:dashed"></div>
+    <div class="g-edge dash" style="left:134px;top:175px;width:calc(100% - 268px);height:0;border-top-style:dashed"></div>
+    <div class="g-edge dash" style="left:90px;top:60px;width:0;height:60px;border-left:2px dashed var(--dash);background:none;border-top:none"></div>
+  </div>
+</div>
+
+<footer>
+  <p>FoolPaper · MIT License · 自动生成于 2026-07-30</p>
+  <p><a href="https://github.com/zqian6263-design/FOOl-Paper">GitHub</a> · <a href="index.md">索引</a></p>
+</footer>
+
+</div>
+</body>
+</html>
