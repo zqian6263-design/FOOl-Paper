@@ -2,12 +2,17 @@
 
 > 自动生成的全局索引。由 `organizer.py` 维护。
 
-## 标签索引
+---
 
-按标签汇总已读论文。
+## 按标签浏览
 
-<!-- index_content will be auto-generated here -->
+<!-- 标签索引由 organizer.py 自动更新 -->
+
+## 论文列表
+
+<!-- 论文列表由 organizer.py 自动更新 -->
 
 ---
 
-*最后更新: {date}*
+*最后更新: 2026-07-30*
+*由 [FOOL-paper](https://github.com/zqian6263-design/FOOl-Paper) 管理*
