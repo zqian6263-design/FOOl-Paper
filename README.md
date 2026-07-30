@@ -33,6 +33,20 @@
 
 ---
 
+## 项目状态
+
+当前版本 v0.2.0 — 已产出的实验版本。6 篇论文（LoRA / ResNet / NCA / BD-CLS / TeACFNet / 综述）已完成全模块分析并通过验证。知识库可用，持续迭代中。
+
+## 适用人群
+
+- 每天需要读学术论文的研究者 / 学生
+- 想让 AI 做深度分析而非表面摘要的人
+- 使用 Hermes Agent / Claude Code / OpenCode / Codex CLI 的用户
+
+不适用：不需要分析深度、只想要两句话摘要的快速浏览场景。
+
+---
+
 ## 快速开始
 
 让任意 AI Agent（Hermes / Claude Code / Codex / OpenCode）加载 `SKILL.md`，然后说：
@@ -62,37 +76,32 @@ Agent 自动跑完：安全扫描 → 复杂度预估 → PDF 解析 → 费曼�
 
 ## 输出示例
 
-每篇论文生成一个 Markdown 笔记（7-9KB），含完整 frontmatter + 全模块分析：
+从已生成的 LoRA 论文笔记中摘录：
 
-```markdown
----
-title: "LoRA: Low-Rank Adaptation of Large Language Models"
-authors: "Edward Hu et al."
-year: 2022
-arxiv_id: 2106.09685
-tags: [parameter-efficient-fine-tuning, low-rank-decomposition, ...]
----
+**公式解释（符号追踪 + 结构分析 + 类比）：**
 
-# LoRA
+| 符号 | 含义 | 维度 | 可调？ |
+|------|------|------|--------|
+| W₀ | 预训练权重矩阵 | d×d | ❌ 冻结 |
+| A | 低秩矩阵（压缩） | d×r | ✅ 训练 |
+| B | 低秩矩阵（解压） | r×d | ✅ 训练 |
+| r | 秩（rank） | r<<d | ✅ 超参 |
 
-**作者**: ... | **会议**: ICLR 2022 | **引用**: 20,000+
+**费曼拆解·术语降级表：**
 
-## 费曼拆解
-### 术语降级表
 | 术语 | 通俗解释 |
+|------|---------|
 | Low-Rank | 瘦身版小矩阵 |
+| Rank decomposition | 大矩阵拆成两个小矩阵相乘 |
+| Fine-tuning | 先通识教育 → 再专业课 |
 
-### 从头推导
-1. W₀ ∈ R^(d×d)，ΔW 也是 d×d
-2. 核心洞察: ΔW 不需要 d×d 自由度——低秩的
+**「我的思考」摘录（跨论文关联）：**
 
-## 公式解释
-| 符号 | 含义 | 维度 | 可调？|
-| A | 压缩矩阵 | d×r | ✅ |
+> LoRA 的成功暗示了大模型的知识高度冗余——这与 Neural Causal Abstractions 在"高维冗余中寻找低维结构"上异曲同工。
 
-## 我的思考
-> LoRA 与 Neural Causal Abstractions 有结构性共鸣——都在高维冗余中找低维结构。
-```
+完整笔记见知识库 `papers/2106.09685.md`。
+
+项目展示页：`foolpaper.html`（位于项目根目录，双击即可在浏览器打开）。
 
 ---
 
@@ -101,10 +110,26 @@ tags: [parameter-efficient-fine-tuning, low-rank-decomposition, ...]
 ```
 fool-paper/
 ├── SKILL.md                    # 主入口 — Agent 加载即得全部能力
-├── AGENTS.md                   # Agent 入口
+├── AGENTS.md / CLAUDE.md / OPENCODE.md   # 各 Agent 入口
+├── DESIGN.md                   # 完整设计文档
 ├── pyproject.toml              # Python 包配置
-├── paper_pal/
-│   └── __init__.py             # Python 包（其他模块为 SKILL.md 规划的未来模块）
+├── install.sh                  # 一键安装脚本
+├── foolpaper.html              # 知识库静态展示页
+├── fool_paper/                 # Python 核心（17 模块）
+│   ├── paper.py                # 数据模型
+│   ├── fetcher.py              # arxiv / PDF / URL 获取
+│   ├── parser.py               # PDF 解析
+│   ├── analyzer.py             # 6 路并行分析引擎
+│   ├── formula.py              # 公式语义理解 + 符号追踪
+│   ├── reporter.py             # 报告生成
+│   ├── organizer.py            # 标签 + 入库
+│   ├── knowledge_graph.py      # 跨论文关系图
+│   ├── workflow.py             # Pipeline 编排
+│   ├── cache.py                # 多级缓存
+│   ├── safety.py               # 安全分类
+│   ├── complexity.py           # 难度预估
+│   ├── qa.py                   # 交互问答
+│   └── knowledge_base/         # 产物目录
 ├── prompts/                    # 6 个分析模板
 │   ├── feynman-deconstruction.md
 │   ├── first-principles.md
@@ -112,8 +137,17 @@ fool-paper/
 │   ├── replication-guide.md
 │   ├── concept-explanation.md
 │   └── translation.md
-├── knowledge_base/             # 产物目录
-├── install.sh                  # 一键安装脚本
+├── tests/                      # 单元测试
 ├── LICENSE                     # MIT
 └── README.md
 ```
+
+---
+
+## 设计理念
+
+FoolPaper 的完整设计决策、6 个行业痛点的完整论证、Pipeline 架构和知识图谱进化路线见 **[DESIGN.md](DESIGN.md)**（项目根目录）。
+
+## License
+
+MIT License — 详见 [LICENSE](LICENSE)。
