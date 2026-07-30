@@ -42,10 +42,10 @@ def test_auto_tag_nlp():
 
 
 def test_auto_tag_empty_paper():
-    """空论文应标记为未分类"""
+    """空论文应标记为需LLM推断"""
     paper = ParsedPaper(title="Unknown")
     tags = _auto_tag(paper)
-    assert "未分类" in tags
+    assert "需LLM推断" in tags
 
 
 def test_generate_paper_id_arxiv():

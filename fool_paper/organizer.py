@@ -115,9 +115,10 @@ def _auto_tag(paper: ParsedPaper) -> list[str]:
         if "cs.CL" in kw or "cs.LG" in kw:
             tags.add("机器学习")
 
-    # 至少有一个标签
+    # 至少尝试推断
     if not tags:
-        tags.add("未分类")
+        # 用 LLM 推断标签的提示
+        tags = ["需LLM推断"]
 
     return sorted(tags)
 

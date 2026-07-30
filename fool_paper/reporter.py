@@ -130,26 +130,10 @@ def _build_classification(result: AnalysisResult) -> str:
 
 
 def _build_thoughts() -> str:
-    """构建个人思考模板。"""
-    return """## 🤔 我的思考
+    """构建个人思考模板（占位，Agent 必须填充实内容）。"""
+    return """## 我的思考
 
-> *在此记录你的理解和疑问…*
-
-### 核心收获
-- ...
-- ...
-
-### 未解决的疑问
-- ...
-- ...
-
-### 与已有知识的连接
-- ...
-- ...
-
-### 值得深入的方向
-- ...
-- ..."""
+> ⚠️ Agent 必须填充至少 3-5 句实际内容，禁止保留此占位符。"""
 
 
 def _build_references(paper: ParsedPaper, limit: int = 10) -> str:

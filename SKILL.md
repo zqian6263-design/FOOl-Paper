@@ -1,7 +1,7 @@
 ---
 name: fool-paper
 description: "Use when the user asks to read, analyze, summarize, translate, or understand an academic paper / research article. Covers: Feynman deconstruction, first-principles analysis, formula explanation, innovation critique, reproducibility check, paper classification, and Q&A on a paper's content."
-version: 0.1.0
+version: 0.2.0
 author: FOOL-paper contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -11,336 +11,220 @@ metadata:
     related_skills: []
 ---
 
-# FOOL-paper — 学术论文智能阅读助手
+# FoolPaper — 学术论文智能阅读助手
 
-## Overview
+> "Explain it like I'm a fool — then you truly understand it."
 
-FOOL-paper 是一个 AI Agent 驱动的学术论文阅读辅助系统。核心思想：
+## 能力总览
 
-1. **降低阅读障碍** — 翻译 + 术语解释 + 句式简化
-2. **降低理解难度** — 费曼技巧 + 第一性原理层层拆解
-3. **辅助深度思考** — 创新点识别、不足分析、改进方向推荐
-4. **构建知识网络** — 论文自动归类、标签管理、知识库构建
-5. **交互式学习** — 基于论文上下文的问答
+| 能力 | 触发方式 | 说明 |
+|------|---------|------|
+| **📥 获取论文** | `arxiv:XXXX.XXXXX` / 本地PDF路径 / URL | 从 arxiv/OpenReview/本地获取全文 |
+| **🌐 翻译+术语** | 自动随分析执行 | 中英翻译 + 术语延展解释 |
+| **🧠 费曼拆解** | 每篇论文必须执行 | 层层简化，用自己的话解释 |
+| **🔬 第一性原理** | 每篇论文必须执行 | 拆到不可再分的基本原理 |
+| **📐 公式理解** | 论文中有 LaTeX 公式时必须执行 | 符号指代追踪 + 自然语言解释（调用 concept-explanation.md） |
+| **💡 创新与不足** | 每篇论文必须执行 | novelty / limitation / improvement |
+| **🔄 复现分析** | 每篇论文必须执行 | 数据集 + 环境 + 代码链接分析 |
+| **🗂️ 归类入库** | 报告生成后自动 | 标签 + knowledge_base 存储 |
+| **💬 追问** | 用户提出具体问题 | 基于论文上下文的交互问答 |
 
-> **名字由来**：F = Feynman Deconstruction, O = Open Reading, O = Organized Knowledge, L = Literature Intelligence
+## 工作流程
 
-## When to Use
+用户输入论文来源后，按以下 pipeline 执行：
 
-- 用户要求阅读/分析/总结一篇论文（arxiv/PDF/URL）
-- 用户要求理解论文中的公式、概念、方法
-- 用户需要评估论文的创新点和不足之处
-- 用户想复现论文的实验或方法
-- 用户想将论文归纳到自己的知识库中
-- 用户想基于某篇论文进行问答/讨论
+---
 
-**不要用于**：非学术文本的分析（新闻、博客等），没有全文可获取的论文（无法获取时告知用户原因）。
+### ⚠️ 强制规则
 
-## Core Workflow
+以下分析模块对每篇论文**必须全部执行，不得跳过**。除非用户明确说"只做费曼拆解"等指定子集：
 
-当你收到论文分析请求时，遵循以下流程：
+- ✅ 翻译 + 术语解释
+- ✅ 费曼拆解
+- ✅ 第一性原理分析
+- ✅ 创新点与不足分析
+- ✅ 复现分析
+- ✅ 公式理解（论文中有 LaTeX 公式时自动触发）
 
-### Step 1: 识别论文来源
+执行完成后，**必须填充「我的思考」部分**，总结这篇论文对你个人的启发和疑惑，不得保留模板占位符。
 
-确定用户提供的论文来源类型：
+---
 
-| 来源 | 示例 | 提取方式 |
-|------|------|---------|
-| arxiv URL/ID | `arxiv:2306.xxxxx` / `https://arxiv.org/abs/2306.xxxxx` | `fool_paper.fetcher.from_arxiv()` |
-| arxiv PDF | `https://arxiv.org/pdf/2306.xxxxx.pdf` | `fool_paper.fetcher.from_arxiv_pdf()` |
-| 本地 PDF | `/path/to/paper.pdf` | `fool_paper.fetcher.from_local_pdf()` |
-| 通用 URL | `https://openreview.net/forum?id=xxx` | `fool_paper.fetcher.from_url()` |
-| OpenReview | OpenReview forum URL | `fool_paper.fetcher.from_openreview()` |
+### 第 1 步：入口检查
 
-若为纯文本/LaTeX 源码直接让用户提供即可。
+1. `safety.py` — 扫描论文标题/摘要，判断是否属于敏感领域
+2. `complexity.py` — 预估页数、公式密度、引用数，决定 effort level
 
-### Step 2: 门户检查 — Safety + Complexity
+### 第 2 步：获取与解析
 
-#### Safety Check
+1. `fetcher.py` — 从 arxiv/URL/本地路径获取论文
+2. `parser.py` — 提取正文段落、公式（LaTeX）、图表、引用
+3. `cache.py` — 缓存解析结果（按文件 hash）
 
-对论文标题和摘要进行安全扫描：
+#### 元数据验证
 
-```
-safety_level = fool_paper.safety.classify(title, abstract)
-```
+生成笔记前必须检查以下字段，**禁止使用占位符或未经验证的值**：
 
-| 级别 | 含义 | 行为 |
-|------|------|------|
-| `safe` | 常规学术论文 | 正常分析 |
-| `sensitive` | 涉及敏感领域（生物/化学/网络/国防） | 降级：仅做客观翻译和概念解释，不做改进建议 |
-| `restricted` | 明确违禁内容 | 拒绝分析，说明原因 |
+- `arxiv_id`：必须去 arxiv API 查询确认，格式必须是 `XXXX.XXXXX`。如果找不到对应论文，标注 `⚠️ 未核实` 并说明原因，禁止使用文件名当 ID
+- `title`：必须与论文原文标题一致，禁止截断
+- `year`：必须核对论文出版年份
+- `tags`：不能留 `未分类`（见标签规则）
 
-#### Complexity Estimate
+### 第 3 步：分析（并行执行）
 
-```
-effort = fool_paper.complexity.estimate(pages, formula_density, ref_count)
-```
+- `analyzer.py` 执行以下子任务（默认并行，用户可选串行）：
+  - **翻译 + 术语解释**：调用 `prompts/translation.md`，遇到重要概念时引用 `prompts/concept-explanation.md`
+  - **费曼拆解**：调用 `prompts/feynman-deconstruction.md`
+  - **第一性原理**：调用 `prompts/first-principles.md`
+  - **创新点分析**：调用 `prompts/innovation-analysis.md`
+  - **复现分析**：调用 `prompts/replication-guide.md`
+- `formula.py`（并行）：提取论文中的 LaTeX 公式，调用 `prompts/concept-explanation.md` 做语义解释
+- `cache.py` 缓存每一路的分析结果
 
-| Effort Level | 适用场景 | 建议模型 |
-|-------------|---------|---------|
-| `low` | ≤8 页、少公式、survey | 快速模型 |
-| `medium` | 8-15 页、常规 | 标准模型 |
-| `high` | >15 页、密集公式、方法论论文 | 强模型 + 高 effort |
-| `very_high` | 数学/理论论文、>25 页 | 最强模型 + 最大 effort |
+### 第 4 步：产出
 
-**向用户报告**：安全分类结果 + 预估复杂度 + 预计模型选择，让用户确认或调整。
+1. `organizer.py` — 自动打标签、分类
+2. `reporter.py` — 生成结构化 Markdown 阅读报告，写入 `knowledge_base/papers/`
+3. `qa.py` — 进入交互问答模式，等待用户追问
 
-### Step 3: 获取与解析
+#### 标签规则
 
-```python
-from fool_paper.fetcher import fetch_paper
-from fool_paper.parser import parse_paper
+- **禁止**将标签设为 `未分类`
+- 如果 Agent 无法从论文内容推断标签，**必须调用 LLM 推断至少 1-3 个标签**
+- 标签偏好顺序：论文原文关键词 > arxiv 分类 > LLM 推断 > 已有知识库标签
+- 标签使用英文（便于跨语言检索），中文论文也可用中文
 
-# 获取论文全文
-raw = fetch_paper(source)
+## 输出格式规范
 
-# 解析为结构化文本
-parsed = parse_paper(raw)
-# 返回: {title, authors, abstract, sections, formulas, figures, references, ...}
-```
+### 报告结构（必须遵守）
 
-如果 arxiv API 无法获取摘要/元数据，尝试直接从 PDF 提取。
-
-**无法获取时**：明确告知用户原因（网络问题、PDF 损坏、PDF 受密码保护等），不要假装成功。
-
-**解析要点**：
-- 按章节(section)组织正文段落
-- 单独提取公式（LaTeX 形式）
-- 记录图表标题和引用
-- 记录参考文献列表
-
-### Step 4: 运行分析
-
-根据用户的意图（可以一次跑多项），调用 `analyzer.py` 执行分析任务：
-
-```python
-from fool_paper.analyzer import analyze
-
-results = analyze(
-    paper=parsed,
-    tasks=[           # 根据用户需求组合
-        "translate",  # 翻译 + 术语解释
-        "feynman",    # 费曼拆解
-        "first_principles", # 第一性原理
-        "innovation", # 创新+不足+改进
-        "replication",# 复现分析
-    ],
-    effort=effort,   # 从 Step 2 获取
-)
-```
-
-**各任务说明**：
-
-#### 翻译 (translate)
-- 长文分段翻译（必要时保持原文对照）
-- 专业术语首次出现时给出解释和背景
-- 难句进行句式简化
-
-#### 费曼拆解 (feynman)
-- 核心步骤：
-  1. **一句话总结全篇** — 这篇论文到底在说什么？
-  2. **用最简单的话解释核心方法** — 假设你的听众是本科生
-  3. **指出"这里我其实没讲清楚"的部分** — 哪些地方还没有完全理解？
-  4. **类比和实例** — 用生活例子类比论文的核心思想
-  5. **重新整理** — 用自己的逻辑重新组织论文的论证链条
-- 提示词模板参考 `prompts/feynman-deconstruction.md`
-
-#### 第一性原理 (first_principles)
-- 拆解过程：
-  1. **基本假设** — 论文隐含/显式的假设是什么？
-  2. **推导链条** — 从假设到结论的逻辑链
-  3. **哪一步可以质疑** — 哪些推导环节比较薄弱？
-  4. **还原到基础学科** — 核心理念对应到数学/物理/计算机科学的最基础原理
-- 提示词模板参考 `prompts/first-principles.md`
-
-#### 创新分析 (innovation)
-- 结构化输出：
-  - **Novelty** — 这篇论文的原创贡献是什么？和已有工作相比真正新在哪里？
-  - **Strengths** — 方法/实验/理论上的亮点
-  - **Limitations** — 方法的局限、假设的缺陷、实验的不足
-  - **Improvements** — 至少推荐 2-3 个可行的改进方向（具体、可操作）
-- 提示词模板参考 `prompts/innovation-analysis.md`
-
-#### 复现分析 (replication)
-- 检查内容：
-  - **数据集** — 使用的数据集是否公开？
-  - **代码** — 论文是否有官方/第三方实现？链接？
-  - **环境** — 训练/实验环境配置是否可重建？
-  - **核心步骤** — 算法的关键步骤是否描述足够详细
-  - **复现难度评估** — 容易/中等/困难，理由
-- 提示词模板参考 `prompts/replication-guide.md`
-
-#### 公式理解 (formula) — 并行进行分析
-如果论文包含公式，用户可能需要额外理解公式：
-```python
-from fool_paper.formula import explain_formula
-explanations = explain_formula(parsed.formulas, parsed.sections)
-```
-每个公式输出：
-- 公式的数学含义（自然语言）
-- 每个符号的定义和出处（"公式(3)中的 Σ 在 3.1 节定义为…"）
-- 与前文公式的依赖关系
-- 通俗类比
-
-### Step 5: 归类入库
-
-```python
-from fool_paper.organizer import classify_and_store
-
-# 自动分配标签并存入知识库
-classify_and_store(parsed, results, kb_path="knowledge_base/")
-```
-
-**归类策略**：
-- 基于标题+摘要+关键词自动分配标签（如 NLP / CV / RL / 理论等）
-- 优先匹配已有标签，必要时创建新标签
-- 每篇论文在 `knowledge_base/papers/` 下创建一个 Markdown 文件
-- 更新 `knowledge_base/index.md` 全局索引
-
-### Step 6: 生成阅读报告
-
-```python
-from fool_paper.reporter import generate_report
-
-report = generate_report(parsed, results, format="markdown")
-```
-
-**报告输出格式**：
+每篇论文的 Markdown 笔记按以下顺序输出：
 
 ```markdown
-# [论文标题]
+---
+title: ...
+authors: ...
+year: ...
+arxiv_id: XXXX.XXXXX        # 必须真实，禁止占位符
+tags: [tag1, tag2, ...]     # 禁止 未分类
+date_read: YYYY-MM-DD
+---
 
-> 作者 | 年份 | 来源 | 标签
+# 标题
 
-## 📝 摘要（翻译）
+**作者**: ...
+**年份**: ...
+**arxiv**: [ID](链接)
 
-## 🧠 费曼拆解
+`标签1` `标签2`
+
+## 摘要
+
+[论文原文摘要翻译]
+
+## 费曼拆解
 
 ### 一句话总结
 ...
 
-### 用最简单的话解释
+### 术语降级表
 ...
 
-### 类比
+### 从头推导
 ...
 
-## 🔬 第一性原理
-
-### 基本假设
-...
-### 推导链条
-...
-### 可以质疑的环节
+### 反事实
 ...
 
-## 💡 创新与不足
+## 第一性原理分析
 
-| 项目 | 内容 |
-|------|------|
-| Novelty | ... |
-| Strengths | ... |
-| Limitations | ... |
-| 改进方向 | 1. ... 2. ... 3. ... |
+### 追问链
+...
 
-## 🔄 复现分析
+### 假设审计
+...
 
-| 项目 | 状态 |
-|------|------|
-| 数据集 | ✅/⚠️/❌ |
-| 代码 | ✅/⚠️/❌ |
-| 环境 | ✅/⚠️/❌ |
-| 复现难度 | 容易/中等/困难 |
+## 公式解释
 
-## 📐 公式理解
+[对论文中每个关键公式执行 concept-explanation 模板]
 
-[公式相关解释]
+## 创新与不足
 
-## 🤔 我的思考
+### 创新点
+...
 
-[留给用户记录自己的理解和疑问]
+### 不足
+...
 
-## 📎 引用
+### 改进方向
+...
 
-- 重要引用 1
-- 重要引用 2
+## 复现分析
+
+### 环境/数据/代码
+...
+
+### 复现难度
+...
+
+## 我的思考
+
+> [必须有实际内容，至少 3-5 句个人见解，不得保留占位符]
 ```
 
-### Step 7: 交付用户
+### 格式约束
 
-将 `report` 返回给用户，内容包括：
+- 禁止嵌套重复标题（如 `## 费曼拆解` 下不再写 `### 🧠 费曼拆解`）
+- 使用 emoji 前缀（🧠 / 🔬 / 💡 / 🔄 / 📐）必须在三级标题，不在二级
+- `我的思考` 部分必须写实际内容，不得保留 `> *阅读后的个人笔记和想法…*` 模板
 
-1. **简短开场** — 论文标题 + 来源 + 基本信息
-2. **报告全文** — 完整的 Markdown 报告
-3. **后续操作建议**：
-   - "需要进一步解释某个公式/概念吗？"
-   - "想深入讨论某个改进方向吗？"
-   - "这篇论文和之前读过的那篇 XX 有联系，需要我建立关联吗？"
-   - "有任何地方讲得太快需要重新解释吗？"
+### 文件命名规则
 
-## 交互问答模式
+笔记文件名使用 `{arxiv_id}.md` 格式（优先），无 arxiv ID 的论文使用 `{作者简写-标题关键词}.md`。
 
-如果用户在阅读报告后想继续对话：
+文件名中禁止出现 `unnamed` / `untitled` / `test` 等占位名称。
 
-```python
-from fool_paper.qa import ask_about_paper
-
-# 基于论文上下文回答用户问题
-answer = ask_about_paper(question, parsed, context=results)
-```
-
-这种模式下：
-- 始终引用论文原文段落的出处
-- 不确定时明确指出"论文中没有明确说明，我的理解是…"
-- 对于超出论文范围的问题，引导回论文 + 提供已知的最佳猜测
-
-## 知识管理
-
-### 查看知识库
+## 用户常用指令
 
 ```
-显示我的知识库
-→ 按标签展示已读论文列表
-→ 或查询特定标签下的论文
+"帮我读这篇论文 arxiv:2305.12345"
+"用费曼技巧拆解第三章的证明"
+"解释公式 (3) 里的符号都是什么"
+"这篇的创新点在哪？有什么明显缺陷？"
+"能复现吗？需要什么环境？"
+"总结一下，然后归类到 Transformer 方向"
 ```
 
-### 跨论文关联
+## Prompt 模板引用
+
+分析时从 `prompts/` 目录加载对应的提示词模板。各模板的定位：
+
+- `feynman-deconstruction.md` — 费曼拆解：层层简化到外行能懂
+- `first-principles.md` — 第一性原理：追到不证自明的基本公理
+- `innovation-analysis.md` — 识别 novelty / limitation / improvement
+- `replication-guide.md` — 提取环境、依赖、代码库
+- `concept-explanation.md` — 概念阐释引擎：类比+对偶+反向+盲区
+- `translation.md` — 翻译指令：学术准确 + 术语加注
+
+## 知识库结构
 
 ```
-这篇文章和之前读的 XX 有什么关系？
-→ 对比两篇论文的核心方法、假设、实验设置
-→ 找出共同引用和不同点
+knowledge_base/
+├── index.md              # 全局索引（自动维护）
+└── papers/
+    ├── 1512.03385.md               # 每篇论文一个笔记文件
+    └── causal-feature-survey-wang.md
 ```
 
-### 导出知识库
-
+每个笔记文件包含 YAML frontmatter：
+```yaml
+---
+title: 论文标题
+authors: [作者列表]
+arxiv_id: XXXX.XXXXX
+tags: [transformer, scaling, attention]
+category: NLP
+read_at: 2025-01-15
+rating: ★★★★☆
+---
 ```
-导出我的知识库
-→ knowledge_base/ 目录打包
-→ 或生成知识图谱可视化
-```
-
-## Common Pitfalls
-
-1. **PDF 解析不完整** — 某些 PDF（扫描版、双栏紧凑排版）可能提取失败或丢失顺序。告知用户局限性，尝试用 OCR 模式。
-2. **arxiv API 被限流** — 短时间多次请求可能被限。内部自动重试 + 退避。
-3. **公式提取错误** — 复杂 LaTeX 或嵌入图片的公式无法正确提取。向用户报告哪些公式无法解析。
-4. **LLM 幻觉** — AI 分析尤其是"创新分析"和"改进方向"可能产生幻觉。在报告中标注"这是 AI 生成的分析，建议人工复核"。
-5. **长论文 token 超限** — 超过上下文窗口的论文需要分段处理。自动将长论文按章节分段分析后合并。
-6. **不要一次性跑所有分析** — 除非用户明确要求，否则根据上下文判断用户真正需要什么。一个用户说"帮我翻译这篇论文"，你不要跑去分析创新点和复现。
-
-## Verification Checklist
-
-- [ ] 论文来源已识别，获取成功或明确告知失败原因
-- [ ] 安全分类已执行并告知用户
-- [ ] 复杂度已评估，模型选择已确定
-- [ ] 分析任务仅包含用户需要的（不额外增加）
-- [ ] 阅读报告已生成并交付用户
-- [ ] 论文已存入知识库（若用户同意）
-- [ ] 给出了后续操作的建议
-
-## 已知限制
-
-- 不支持扫描版 PDF 的 OCR（依赖 PyMuPDF 的文本提取精度）
-- 不支持数学公式的语义理解（v1 仅做 LaTeX → 自然语言解释）
-- 跨论文知识图谱 v2 实现
