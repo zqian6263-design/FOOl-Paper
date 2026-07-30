@@ -143,6 +143,13 @@ def classify_and_store(
     # 更新索引
     _update_index(kb_path, paper, tags, note_path)
 
+    # 增量更新知识图谱
+    try:
+        from .knowledge_graph import export_graph_markdown
+        export_graph_markdown(kb_path)
+    except Exception:
+        pass  # 图谱更新失败不影响主流程
+
     return str(note_path)
 
 
