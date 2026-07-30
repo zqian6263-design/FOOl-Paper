@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "fool-paper"
+version = "0.1.0"
+description = "FOOL-paper — 学术论文智能阅读助手：费曼拆解、第一性原理分析、复现指导、知识管理"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "zqian6263-design"},
+]
+keywords = ["academic", "paper", "reading", "feynman", "first-principles", "research"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Education",
+]
+
+dependencies = [
+    "pydantic>=2.0",
+    "PyMuPDF>=1.25",
+    "requests>=2.31",
+    "arxiv>=2.0",
+    "sympy>=1.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/zqian6263-design/FOOL-paper"
+Repository = "https://github.com/zqian6263-design/FOOL-paper"
+
+[tool.setuptools.packages.find]
+include = ["fool_paper*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
