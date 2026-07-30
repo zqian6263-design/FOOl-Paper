@@ -109,13 +109,13 @@ Agent 自动跑完：安全扫描 → 复杂度预估 → PDF 解析 → 费曼�
 
 ```
 fool-paper/
-├── SKILL.md                    # 主入口 — Agent 加载即得全部能力
-├── AGENTS.md / CLAUDE.md / OPENCODE.md   # 各 Agent 入口
+├── SKILL.md / AGENTS.md / CLAUDE.md / OPENCODE.md   # 各 Agent 入口
 ├── DESIGN.md                   # 完整设计文档
 ├── pyproject.toml              # Python 包配置
 ├── install.sh                  # 一键安装脚本
-├── foolpaper.html              # 知识库静态展示页
-├── fool_paper/                 # Python 核心（17 模块）
+├── LICENSE                     # MIT
+├── fool_paper/                 # Python 核心（14 模块）
+│   ├── __init__.py
 │   ├── paper.py                # 数据模型
 │   ├── fetcher.py              # arxiv / PDF / URL 获取
 │   ├── parser.py               # PDF 解析
@@ -128,8 +128,7 @@ fool-paper/
 │   ├── cache.py                # 多级缓存
 │   ├── safety.py               # 安全分类
 │   ├── complexity.py           # 难度预估
-│   ├── qa.py                   # 交互问答
-│   └── knowledge_base/         # 产物目录
+│   └── qa.py                   # 交互问答
 ├── prompts/                    # 6 个分析模板
 │   ├── feynman-deconstruction.md
 │   ├── first-principles.md
@@ -137,8 +136,7 @@ fool-paper/
 │   ├── replication-guide.md
 │   ├── concept-explanation.md
 │   └── translation.md
-├── tests/                      # 单元测试
-├── LICENSE                     # MIT
+├── tests/                      # 14 个单元测试
 └── README.md
 ```
 
