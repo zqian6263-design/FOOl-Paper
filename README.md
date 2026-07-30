@@ -1,254 +1,123 @@
-<p align="center">
-  <img src="https://img.shields.io/github/stars/zqian6263-design/FOOl-Paper?style=social" alt="stars">
-  <img src="https://img.shields.io/github/license/zqian6263-design/FOOl-Paper" alt="license">
-  <img src="https://img.shields.io/badge/python-3.10%2B-blue" alt="python">
-  <img src="https://img.shields.io/badge/tests-90%20passed-success" alt="tests">
-</p>
+# FoolPaper — 不是摘要器，是解剖框架
 
-<h1 align="center">🎓 FOOL-paper</h1>
-<p align="center"><em>"Explain it like I'm a fool — then you truly understand it."</em></p>
+> "Explain it like I'm a fool — then you truly understand it."
+
+用 AI 读论文的 92.86% 用户第三周就退化成了"帮我总结一下"。FoolPaper 用一套**强制规则**阻止退化——翻译、费曼拆解、第一性原理、公式追踪、创新分析、复现检查，6 个模块必须全部跑完。
 
 ---
 
-## 名字的故事
+## 和普通 AI 读论文的区别
 
-**FOOL** 源自**费曼 (Feynman)** 的谐音游戏，同时也是四个核心能力的首字母：
-
-| 字母 | 含义 | 对应的能力 |
-|------|------|-----------|
-| **F** | **F**eynman Deconstruction | 🧠 费曼拆解 — 用最简单的话讲清论文核心 |
-| **O** | **O**pen Reading | 📖 开放阅读 — 翻译 + 术语 + 扫清语言障碍 |
-| **O** | **O**rganized Knowledge | 🗂 知识管理 — 自动归类 + 知识图谱 |
-| **L** | **L**iterature Intelligence | 📊 文献智能 — 创新分析 + 复现评估 + 改进建议 |
-
-> 费曼技巧的精髓：**"如果你不能向一个傻瓜解释清楚，那你还没有真正理解它。"**
->
-> FOOL-paper 的名字本身就是一个承诺 —— 用对傻瓜说话的方式，把最复杂的论文讲透。
+| | 普通 AI + 提示词 | FoolPaper |
+|--|-----------------|-----------|
+| 本质 | 被动摘要器 | 主动解剖框架 |
+| 对公式 | 忽略或模式匹配 | 符号追踪 + 结构分析 + 类比 |
+| 对术语 | 照搬 | 降级为日常白话 |
+| 对创新 | 不分真假 | 强制写"本质区别" |
+| 对验证 | 无 | 复现分析（代码链接是否真实？） |
+| 知识积累 | 对话结束即消失 | 知识库持久化 + 跨论文关联 |
+| 使用趋势 | 越用越浅 | 框架强制多维，无法退化 |
 
 ---
 
-## 这是什么
+## 它杀了 6 个行业痛点
 
-**FOOL-paper** 是一个开源学术论文智能阅读助手，供 **AI Agent** 直接部署使用。
-
-你只需要说一句：
-
-```
-帮我读这篇 arxiv:1706.03762
-```
-
-Agent 就会自动完成：
-
-```
-📥 下载论文  →  📊 分析难度  →  🧠 费曼层层拆解
-    ↓
-💡 找出创新点与不足  →  🔄 评估可复现性
-    ↓
-📝 生成阅读笔记  →  🗂 自动归类入库  →  🕸️ 更新知识图谱
-```
-
-**一句话**：让你读论文像读故事一样轻松。
+| # | 痛点 | 研究来源 | FoolPaper 怎么杀 |
+|---|------|---------|-----------------|
+| 1 | **泛化偏见** — AI 泛化概率高 5 倍 | Royal Society Open Science, 2025 | 术语降级表：不许说"参数被优化"，必须说"大矩阵拆成 A×B，只训练几千个参数" |
+| 2 | **公式盲区** — LLM 对公式完全无力 | Cornell + Google, 2025 | formula.py：每个符号追踪含义/维度/可训练性 + 结构分析 + 类比 |
+| 3 | **真伪不分** — 把方法当领域，不分里程碑 | TLDR Scholar 翻车 | 强制写"本质区别"——一句话说清和 prior work 在哪个关键点分叉 |
+| 4 | **幻觉当事实** — 不同 LLM 搜同一领域结果重叠率 0% | Galaxy Project, 2025 | concept-explanation 内置验证指令 + 复现分析硬检查代码/数据是否真实 |
+| 5 | **越用越浅** — 第三周 92.86% 退化 | U of Washington, 2025 | SKILL.md 强制规则：6 个模块全部执行，不可跳过 |
+| 6 | **不知道自己不知道** — 验证能力依赖你本不具备的领域知识 | FoolPaper 推导 | concept-explanation 盲区提示 + "我的思考"强制跨论文关联，暴露知识盲区 |
 
 ---
 
-## 核心能力
+## 快速开始
 
-<table>
-<tr>
-<td width="33%">
+让任意 AI Agent（Hermes / Claude Code / Codex / OpenCode）加载 `SKILL.md`，然后说：
 
-### 🧠 费曼拆解
-- 一句话总结全文
-- 用最日常的语言解释核心方法
-- 生活类比 + 论证链条重构
-- 诚实标注"哪些地方还没讲清楚"
+```
+帮我读这篇论文 arxiv:2106.09685
+```
 
-</td>
-<td width="33%">
-
-### 🔬 第一性原理
-- 识别论文的基本假设
-- 重建"因为…所以…"推导链
-- 指出最薄弱的逻辑环节
-- 还原到基础学科原理
-
-</td>
-<td width="33%">
-
-### 💡 创新与不足
-- 区分真创新 / 组合创新 / 增量
-- 结构化局限性分析
-- 2-5 个具体可操作的改进方向
-- 按可行性排序
-
-</td>
-</tr>
-<tr>
-<td>
-
-### 🌐 翻译 + 术语
-- 中英文对照
-- 术语首次出现自动解释
-- 长难句拆分
-- 保留原文引用和公式
-
-</td>
-<td>
-
-### 🔄 复现分析
-- 数据集 / 代码 / 环境检查
-- 核心算法步骤完整性评估
-- 复现难度评级
-- 避坑指南
-
-</td>
-<td>
-
-### 🕸️ 知识图谱
-- 5 种关系自动发现
-- Mermaid 可视化
-- 同标签 / 同作者 / 引用链
-- 方法演化追踪
-
-</td>
-</tr>
-</table>
+Agent 自动跑完：安全扫描 → 复杂度预估 → PDF 解析 → 费曼拆解 → 第一性原理 → 公式追踪 → 创新分析 → 复现检查 → 打标签 → 入库 → 生成笔记。
 
 ---
 
-## 安装
+## 能力列表
 
-### 方式一：AI Agent 技能（推荐）
-
-```bash
-# 克隆项目
-git clone https://github.com/zqian6263-design/FOOl-Paper.git
-cd FOOl-Paper
-
-# 一键安装
-bash install.sh
-
-# 或手动安装
-pip install -e .
-```
-
-AI Agent 加载 `SKILL.md` 后即刻获得全部能力：
-
-| Agent | 入口文件 | 自动识别 |
-|-------|---------|---------|
-| Hermes Agent | `SKILL.md` | 手动加载 |
-| Claude Code | `CLAUDE.md` | ✅ 自动 |
-| OpenCode | `OPENCODE.md` | ✅ 自动 |
-| Codex CLI | `AGENTS.md` | ✅ 自动 |
-
-### 方式二：Python 库
-
-```python
-from fool_paper.workflow import run_pipeline_with_report
-
-# 一行搞定
-result, report = run_pipeline_with_report("1706.03762")
-print(report)
-```
+| 模块 | 做什么 |
+|------|--------|
+| `feynman-deconstruction` | 术语降级 + 从头推导 + 反事实——不许说"参数被优化" |
+| `first-principles` | 追问链 + 假设审计——这个假设不成立会怎样？ |
+| `formula` | 符号表（含义/维度/可训）+ 结构分析 + 类比 |
+| `innovation-analysis` | 强制写"本质区别"——不是"提出新方法" |
+| `replication` | 硬检查代码链接真实性、数据集可获取性 |
+| `concept-explanation` | 类比 + 对偶 + 反向 + 盲区——不自欺 |
+| `organizer` | 自动打标签 + 知识库入库 + 跨论文图 |
+| `qa` | 基于论文上下文的追问 |
 
 ---
 
-## 30 秒上手
+## 输出示例
 
-```python
-from fool_paper.workflow import run_pipeline_with_report
-from fool_paper.organizer import classify_and_store
-from fool_paper.qa import ask_about_paper
+每篇论文生成一个 Markdown 笔记（7-9KB），含完整 frontmatter + 全模块分析：
 
-# 1. 读论文
-result, report = run_pipeline_with_report(
-    "https://arxiv.org/abs/1706.03762",
-    tasks=["feynman", "innovation", "replication"],
-)
+```markdown
+---
+title: "LoRA: Low-Rank Adaptation of Large Language Models"
+authors: "Edward Hu et al."
+year: 2022
+arxiv_id: 2106.09685
+tags: [parameter-efficient-fine-tuning, low-rank-decomposition, ...]
+---
 
-# 2. 存知识库
-path = classify_and_store(result.paper, kb_path="knowledge_base/")
+# LoRA
 
-# 3. 问问题
-prompt = ask_about_paper("Self-attention 和 RNN 的区别？", result.paper)
+**作者**: ... | **会议**: ICLR 2022 | **引用**: 20,000+
 
-# 4. 看知识图谱
-from fool_paper.knowledge_graph import export_graph_markdown
-export_graph_markdown("knowledge_base/")
-# → knowledge_base/graph.md (含 Mermaid 图)
+## 费曼拆解
+### 术语降级表
+| 术语 | 通俗解释 |
+| Low-Rank | 瘦身版小矩阵 |
+
+### 从头推导
+1. W₀ ∈ R^(d×d)，ΔW 也是 d×d
+2. 核心洞察: ΔW 不需要 d×d 自由度——低秩的
+
+## 公式解释
+| 符号 | 含义 | 维度 | 可调？|
+| A | 压缩矩阵 | d×r | ✅ |
+
+## 我的思考
+> LoRA 与 Neural Causal Abstractions 有结构性共鸣——都在高维冗余中找低维结构。
 ```
+
+完整案例见 `knowledge_base/papers/2106.09685.md`（LoRA）等 6 篇已生成笔记。
 
 ---
 
 ## 项目结构
 
 ```
-FOOl-Paper/
-├── SKILL.md                      ← AI Agent 主入口
-├── CLAUDE.md / OPENCODE.md / AGENTS.md
-│
-├── fool_paper/                   ← 核心 Python 包 (17 模块)
-│   ├── paper.py                  # 数据模型
-│   ├── fetcher.py                # arxiv/PDF/URL 获取
-│   ├── parser.py                 # PyMuPDF 解析
-│   ├── analyzer.py               # prompt 构建引擎
-│   ├── reporter.py               # Markdown 报告
-│   ├── workflow.py               # Pipeline 编排
-│   ├── cache.py                  # 多级缓存
-│   ├── safety.py                 # 安全分类
-│   ├── complexity.py             # 难度预估
-│   ├── formula.py                # LaTeX 语义理解
-│   ├── qa.py                     # 交互问答
-│   ├── organizer.py              # 自动归类 + 入库
-│   ├── knowledge_graph.py        # 知识图谱
-│   └── knowledge_base/           # 本地知识库
-│
-├── prompts/                      ← 6 个 LLM 提示词模板
-├── tests/                        ← 90 个单元测试
-└── install.sh
+foolpaper/
+├── SKILL.md                    # 主入口 — Agent 加载即得全部能力
+├── fool_paper/                 # Python 核心
+│   ├── analyzer.py             # 6 路并行分析引擎
+│   ├── formula.py              # 公式语义理解 + 符号追踪
+│   ├── organizer.py            # 标签 + 入库
+│   ├── knowledge_graph.py      # 跨论文关系图
+│   └── ...
+├── prompts/                    # 6 个分析模板
+├── knowledge_base/             # 产物目录
+└── tests/                      # 90 个测试
 ```
 
 ---
 
-## 已实现的功能路线图
+## 完整设计文档
 
-| 阶段 | 状态 | 功能 |
-|------|------|------|
-| Phase 1 | ✅ | 骨架 + 数据模型 + 6 提示词模板 |
-| Phase 2 | ✅ | 核心 pipeline：获取 → 解析 → prompt → 报告 |
-| Phase 3 | ✅ | 基础设施：缓存 / 安全 / 难度 / 编排 |
-| Phase 4 | ✅ | 增强：公式理解 / 交互问答 / 知识库 |
-| Phase 5 | ✅ | 知识图谱：5 种关系 / Mermaid 图 / 增量更新 |
+本文档是给人看的概述。完整的设计决策、Pipeline 架构、知识图谱进化路线和 6 个痛点的完整论证见：
 
----
-
-## 测试
-
-```bash
-pip install -e ".[dev]"
-pytest tests/
-# 90 passed ✅
-```
-
----
-
-## 贡献
-
-欢迎 PR 和 Issue！特别欢迎：
-
-- 📄 优化 PDF 解析准确度
-- 🌐 增加更多语言的翻译支持
-- 🏷️ 扩展领域标签体系
-- 🧩 新增分析维度 prompt 模板
-
----
-
-## License
-
-MIT © [zqian6263-design](https://github.com/zqian6263-design)
-
----
-
-<p align="center">
-  <sub>如果你不能简单地解释它，说明你还没有真正理解它。—— 理查德·费曼</sub>
-</p>
+→ **[DESIGN.md](https://github.com/zqian6263-design/FOOl-Paper/blob/master/DESIGN.md)**
