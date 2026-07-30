@@ -1,54 +1,41 @@
 #!/usr/bin/env bash
+# FoolPaper — 一键安装脚本
+# 用法: bash install.sh [target-dir]
+# 默认部署到 Hermes Agent 技能目录
+
 set -euo pipefail
 
-# FOOL-paper 一键安装脚本
-# 用法: bash install.sh [--dev]
+SKILL_DIR="${1:-$HOME/AppData/Local/hermes/skills/research/fool-paper}"
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "📦 部署 FoolPaper 到: $SKILL_DIR"
 
-echo "📦 安装 FOOL-paper..."
-echo ""
+# 创建技能目录
+mkdir -p "$SKILL_DIR/paper_pal"
+mkdir -p "$SKILL_DIR/prompts"
+mkdir -p "$SKILL_DIR/tests/fixtures"
 
-# 检查 Python
-if ! command -v python3 &>/dev/null && ! command -v python &>/dev/null; then
-    echo "❌ 未找到 Python，请先安装 Python 3.10+"
-    exit 1
+# 部署核心文件
+install -m 644 SKILL.md "$SKILL_DIR/SKILL.md"
+install -m 644 AGENTS.md "$SKILL_DIR/AGENTS.md" 2>/dev/null || true
+install -m 644 pyproject.toml "$SKILL_DIR/pyproject.toml" 2>/dev/null || true
+
+# 部署 prompt 模板
+for f in prompts/*.md; do
+    install -m 644 "$f" "$SKILL_DIR/prompts/"
+done
+
+# 部署 Python 包
+if [ -f paper_pal/__init__.py ]; then
+    install -m 644 paper_pal/__init__.py "$SKILL_DIR/paper_pal/"
 fi
 
-PYTHON=$(command -v python3 || command -v python)
-PY_VERSION=$($PYTHON --version 2>&1 | grep -oP '\d+\.\d+')
-echo "✅ Python: $($PYTHON --version)"
-
-# 创建虚拟环境（如果不存在）
-if [ ! -d "$REPO_DIR/.venv" ]; then
-    echo "🔧 创建虚拟环境..."
-    $PYTHON -m venv "$REPO_DIR/.venv"
-fi
-
-# 激活虚拟环境
-source "$REPO_DIR/.venv/bin/activate" 2>/dev/null || source "$REPO_DIR/.venv/Scripts/activate" 2>/dev/null
-
-echo "✅ 虚拟环境: $REPO_DIR/.venv"
-
-# 安装依赖
-echo "📥 安装核心依赖..."
-pip install -e "$REPO_DIR"
-
-# 开发依赖
-if [ "${1:-}" = "--dev" ]; then
-    echo "📥 安装开发依赖..."
-    pip install -e "$REPO_DIR[dev]"
-fi
-
+echo "✅ 部署完成"
 echo ""
-echo "🎉 FOOL-paper 安装完成!"
+echo "下一步："
+echo "  1. 确保 Hermes Agent 已重启"
+echo "  2. 说: \"帮我读这篇论文 arxiv:2106.09685\""
 echo ""
-echo "快速测试:"
-echo "  cd $REPO_DIR"
-echo '  python -c "from fool_paper import __version__; print(__version__)"'
-echo ""
-echo "AI Agent 入口:"
-echo "  - Hermes Agent:  加载 skills/ 或引用 SKILL.md"
-echo "  - Claude Code:   项目自带 CLAUDE.md，自动识别"
-echo "  - OpenCode:      项目自带 OPENCODE.md，自动识别"
-echo "  - Codex CLI:     项目自带 AGENTS.md"
+echo "或者手动加载 SKILL.md:"
+echo "  Hermes: SKILL.md 会自动加载"
+echo "  Claude Code: 将 SKILL.md 放入项目根目录"
+echo "  OpenCode: 引用 SKILL.md 中的能力定义"
