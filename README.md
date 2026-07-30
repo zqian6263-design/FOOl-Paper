@@ -117,11 +117,3 @@ fool-paper/
 ├── LICENSE                     # MIT
 └── README.md
 ```
-
----
-
-## 完整设计文档
-
-本文档是给人看的概述。完整的设计决策、Pipeline 架构、知识图谱进化路线和 6 个痛点的完整论证见：
-
-→ **[DESIGN.md](DESIGN.md)**
