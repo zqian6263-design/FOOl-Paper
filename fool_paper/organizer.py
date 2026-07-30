@@ -139,7 +139,14 @@ def _generate_paper_id(paper: ParsedPaper) -> str:
     # 截断
     if len(title) > 60:
         title = title[:60].rstrip("-")
-    return title.strip("-") or "unnamed"
+    result = title.strip("-") or "unnamed"
+
+    # 中文标题全部被 strip 掉 → 用 hash fallback
+    if result == "unnamed" or len(result) < 3:
+        import hashlib
+        result = hashlib.md5(paper.title.encode()).hexdigest()[:12]
+
+    return result
 
 
 # ── 主流入口 ───────────────────────────────────────────────────────────────────
