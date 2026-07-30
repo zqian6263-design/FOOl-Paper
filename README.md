@@ -94,8 +94,6 @@ tags: [parameter-efficient-fine-tuning, low-rank-decomposition, ...]
 > LoRA 与 Neural Causal Abstractions 有结构性共鸣——都在高维冗余中找低维结构。
 ```
 
-完整案例见 `C:\Users\win\Desktop\fool-paper-kb\papers\2106.09685.md`（LoRA）等 6 篇已生成笔记。
-
 ---
 
 ## 项目结构
