@@ -94,24 +94,30 @@ tags: [parameter-efficient-fine-tuning, low-rank-decomposition, ...]
 > LoRA 与 Neural Causal Abstractions 有结构性共鸣——都在高维冗余中找低维结构。
 ```
 
-完整案例见 `knowledge_base/papers/2106.09685.md`（LoRA）等 6 篇已生成笔记。
+完整案例见 `C:\Users\win\Desktop\fool-paper-kb\papers\2106.09685.md`（LoRA）等 6 篇已生成笔记。
 
 ---
 
 ## 项目结构
 
 ```
-foolpaper/
+fool-paper/
 ├── SKILL.md                    # 主入口 — Agent 加载即得全部能力
-├── fool_paper/                 # Python 核心
-│   ├── analyzer.py             # 6 路并行分析引擎
-│   ├── formula.py              # 公式语义理解 + 符号追踪
-│   ├── organizer.py            # 标签 + 入库
-│   ├── knowledge_graph.py      # 跨论文关系图
-│   └── ...
+├── AGENTS.md                   # Agent 入口
+├── pyproject.toml              # Python 包配置
+├── paper_pal/
+│   └── __init__.py             # Python 包（其他模块为 SKILL.md 规划的未来模块）
 ├── prompts/                    # 6 个分析模板
+│   ├── feynman-deconstruction.md
+│   ├── first-principles.md
+│   ├── innovation-analysis.md
+│   ├── replication-guide.md
+│   ├── concept-explanation.md
+│   └── translation.md
 ├── knowledge_base/             # 产物目录
-└── tests/                      # 90 个测试
+├── install.sh                  # 一键安装脚本
+├── LICENSE                     # MIT
+└── README.md
 ```
 
 ---
@@ -120,4 +126,4 @@ foolpaper/
 
 本文档是给人看的概述。完整的设计决策、Pipeline 架构、知识图谱进化路线和 6 个痛点的完整论证见：
 
-→ **[DESIGN.md](https://github.com/zqian6263-design/FOOl-Paper/blob/master/DESIGN.md)**
+→ **[DESIGN.md](DESIGN.md)**
