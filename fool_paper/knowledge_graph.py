@@ -10,6 +10,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from .organizer import get_kb_path
+
 # ── 数据模型 ───────────────────────────────────────────────────────────────────
 
 class GraphNode:
@@ -80,16 +82,19 @@ class KnowledgeGraph:
 # ── 图谱构建器 ─────────────────────────────────────────────────────────────────
 
 
-def build_graph(kb_path: str | Path = "knowledge_base/") -> KnowledgeGraph:
+def build_graph(kb_path: str | Path | None = None) -> KnowledgeGraph:
     """从知识库目录扫描所有论文笔记，构建知识图谱。
 
     Args:
-        kb_path: 知识库根目录
+        kb_path: 知识库根目录，None 则使用 get_kb_path()
 
     Returns:
         构建好的 KnowledgeGraph
     """
-    kb_path = Path(kb_path)
+    if kb_path is None:
+        kb_path = get_kb_path()
+    else:
+        kb_path = Path(kb_path)
     papers_dir = kb_path / "papers"
     graph = KnowledgeGraph()
 
@@ -393,14 +398,11 @@ def _short_label(paper_id: str, graph: KnowledgeGraph) -> str:
 # ── 增量更新 ───────────────────────────────────────────────────────────────────
 
 
-def update_graph(kb_path: str | Path = "knowledge_base/") -> KnowledgeGraph:
+def update_graph(kb_path: str | Path | None = None) -> KnowledgeGraph:
     """增量更新知识图谱（处理新增和修改的论文）。
 
-    与 build_graph() 的区别：增量模式只更新变更的论文节点和边，
-    但为简单起见，当前实现为全量重建（论文量不大时效率足够）。
-
     Args:
-        kb_path: 知识库根目录
+        kb_path: 知识库根目录，None 则使用 get_kb_path()
 
     Returns:
         更新后的知识图谱
@@ -409,18 +411,22 @@ def update_graph(kb_path: str | Path = "knowledge_base/") -> KnowledgeGraph:
 
 
 def export_graph_markdown(
-    kb_path: str | Path = "knowledge_base/",
+    kb_path: str | Path | None = None,
     output_path: Optional[str | Path] = None,
 ) -> str:
     """导出知识图谱为 Markdown 文件（包含统计 + Mermaid 图）。
 
     Args:
-        kb_path: 知识库根目录
+        kb_path: 知识库根目录，None 则使用 get_kb_path()
         output_path: 输出路径，None 则保存到 knowledge_base/graph.md
 
     Returns:
         生成的 Markdown 文本
     """
+    if kb_path is None:
+        kb_path = get_kb_path()
+    else:
+        kb_path = Path(kb_path)
     graph = build_graph(kb_path)
     stats = graph.stats()
 

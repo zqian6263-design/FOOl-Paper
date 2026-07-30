@@ -2,10 +2,12 @@
 
 - classify_and_store(): 自动标签 + 生成 Markdown 笔记 + 入库
 - 更新 knowledge_base/index.md 全局索引
+- 路径: FOOL_PAPER_KB_DIR 环境变量 > ~/.fool_paper.toml > 默认
 """
 
 from __future__ import annotations
 
+import os
 import re
 from datetime import datetime
 from pathlib import Path
@@ -13,6 +15,41 @@ from typing import Optional
 
 from .paper import ParsedPaper
 from .reporter import generate_report
+
+
+def get_kb_path() -> Path:
+    """获取知识库根目录。优先级: 环境变量 > 配置文件 > 默认。"""
+    env_path = os.environ.get("FOOL_PAPER_KB_DIR")
+    if env_path:
+        p = Path(env_path).expanduser().resolve()
+        # 修复 MSYS 路径转换: /c/ → C:/
+        p_str = str(p)
+        if p_str.startswith("C:\\c\\"):
+            p = Path("C:/" + p_str[5:].lstrip("\\"))
+        return p
+
+    config_path = Path.home() / ".fool_paper.toml"
+    if config_path.exists():
+        try:
+            import tomllib
+        except ImportError:
+            import tomli as tomllib  # type: ignore
+        try:
+            config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+            if "kb_dir" in config:
+                raw = config["kb_dir"]
+                # 确保 Windows 绝对路径被正确识别
+                if raw and len(raw) >= 2 and raw[1] == ":":
+                    p = Path(raw).expanduser().resolve()
+                    p_str = str(p)
+                    if p_str.startswith("C:\\c\\"):
+                        p = Path("C:/" + p_str[5:].lstrip("\\"))
+                    return p
+                return Path(raw).expanduser().resolve()
+        except Exception:
+            pass
+
+    return Path(__file__).resolve().parent / "knowledge_base"
 
 
 # ── 已知标签体系 ───────────────────────────────────────────────────────────────
@@ -111,19 +148,22 @@ def _generate_paper_id(paper: ParsedPaper) -> str:
 def classify_and_store(
     paper: ParsedPaper,
     analysis_result: Optional[dict] = None,
-    kb_path: str | Path = "knowledge_base/",
+    kb_path: str | Path | None = None,
 ) -> str:
     """自动归类论文并存入知识库。
 
     Args:
         paper: 解析后的论文
         analysis_result: 可选的分析结果（用于填充笔记内容）
-        kb_path: 知识库根目录
+        kb_path: 知识库根目录，None 则使用 get_kb_path()
 
     Returns:
         生成的笔记文件绝对路径
     """
-    kb_path = Path(kb_path).resolve()
+    if kb_path is None:
+        kb_path = get_kb_path()
+    else:
+        kb_path = Path(kb_path).resolve()
     papers_dir = kb_path / "papers"
     papers_dir.mkdir(parents=True, exist_ok=True)
 
@@ -276,13 +316,16 @@ def _update_index(
     index_path.write_text(content, encoding="utf-8")
 
 
-def get_kb_stats(kb_path: str | Path = "knowledge_base/") -> dict:
+def get_kb_stats(kb_path: str | Path | None = None) -> dict:
     """获取知识库统计信息。
 
     Returns:
         {total_papers, tags: {tag: count}, last_updated}
     """
-    kb_path = Path(kb_path)
+    if kb_path is None:
+        kb_path = get_kb_path()
+    else:
+        kb_path = Path(kb_path)
     papers_dir = kb_path / "papers"
 
     if not papers_dir.exists():
